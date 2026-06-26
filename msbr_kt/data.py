@@ -10,13 +10,6 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class SequenceDataset(Dataset):
-    """Dataset for already-processed KT sequences.
-
-    Expected pickle format:
-    ``{user_id: [event_1, event_2, ...]}``, where each event contains at least
-    ``problem_id``, ``skill_id``, and ``correct``. IDs must be 1-based; 0 is
-    reserved for padding.
-    """
 
     def __init__(self, raw_pkl: str | Path, seq_len: int = 100):
         self.raw_pkl = Path(raw_pkl)

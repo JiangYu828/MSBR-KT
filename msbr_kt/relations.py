@@ -18,12 +18,6 @@ REQUIRED_RELATION_KEYS = [
 
 
 class RelationResources:
-    """Container for precomputed relation tensors used by MSBR-KT.
-
-    The project intentionally does not include raw-data preprocessing code. The
-    processed data directory is expected to provide ``relations.pt`` with the
-    keys listed in ``REQUIRED_RELATION_KEYS``.
-    """
 
     def __init__(self, rel_dict: dict[str, Any], device: torch.device | str | None = None):
         missing = [k for k in REQUIRED_RELATION_KEYS if k not in rel_dict]
@@ -50,18 +44,6 @@ class RelationResources:
 
 
 def build_time_bias(dt_seq: torch.Tensor, valid_mask: torch.Tensor | None = None, eps: float = 1e-6) -> torch.Tensor:
-    """Build the temporal structured bias matrix.
-
-    Args:
-        dt_seq: Tensor of shape ``[B, T]``. Each value is the interval since the
-            previous interaction.
-        valid_mask: Optional tensor of shape ``[B, T]`` where True/1 indicates a
-            valid interaction.
-        eps: Numerical stability constant.
-
-    Returns:
-        Tensor of shape ``[B, T, T]``. Diagonal and invalid pairs are zeroed.
-    """
     dt_seq = torch.nan_to_num(dt_seq.float(), nan=0.0, posinf=0.0, neginf=0.0).clamp_min(0.0)
     tau = torch.cumsum(dt_seq, dim=1)
     delta = torch.abs(tau.unsqueeze(2) - tau.unsqueeze(1))

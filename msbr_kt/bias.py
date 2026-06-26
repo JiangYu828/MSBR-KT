@@ -8,12 +8,6 @@ from .relations import BIAS_NAMES, build_time_bias
 
 
 def directed_transition_bias(item_seq: torch.Tensor, topk_idx: torch.Tensor, topk_val: torch.Tensor) -> torch.Tensor:
-    """Build a directed transition-bias matrix.
-
-    Returns a tensor of shape ``[B, T_query, T_key]``. Entry ``(i, j)`` stores
-    the precomputed transition strength from historical item ``q_j`` to current
-    item ``q_i``.
-    """
     item_upper_bound = topk_idx.size(0) - 1
     src_items = item_seq.clamp(min=0, max=item_upper_bound)
     idx = topk_idx.index_select(0, src_items.reshape(-1)).view(*src_items.shape, -1)
@@ -23,7 +17,6 @@ def directed_transition_bias(item_seq: torch.Tensor, topk_idx: torch.Tensor, top
 
 
 class StructuredBiasBuilder(nn.Module):
-    """Construct the six structured-bias components used by MSBR-KT."""
 
     def __init__(self, relation_tensors: dict[str, torch.Tensor], n_components: int = len(BIAS_NAMES)):
         super().__init__()
@@ -46,7 +39,6 @@ class StructuredBiasBuilder(nn.Module):
 
     @staticmethod
     def rowwise_normalize(bias: torch.Tensor, valid_mask: torch.Tensor) -> torch.Tensor:
-        """Z-normalize each query row using visible historical keys only."""
         _, _, seq_len, _ = bias.shape
         valid = valid_mask.bool()
         key_valid = valid.unsqueeze(1).unsqueeze(2)

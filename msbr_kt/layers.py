@@ -12,7 +12,6 @@ def causal_mask(seq_len: int, device: torch.device) -> torch.Tensor:
 
 
 class MSBRAttentionLayer(nn.Module):
-    """Causal multi-head attention with routed structured bias."""
 
     def __init__(self, d_model: int, n_heads: int, dropout: float = 0.1):
         super().__init__()
@@ -62,7 +61,6 @@ class MSBRAttentionLayer(nn.Module):
 
 
 class BiasRouter(nn.Module):
-    """Generate per-layer, per-head routing weights over bias components."""
 
     def __init__(self, d_model: int, n_heads: int, n_components: int):
         super().__init__()
@@ -83,7 +81,6 @@ class BiasRouter(nn.Module):
 
 
 class RoutingAwareMoE(nn.Module):
-    """Prediction head whose experts are mixed by the final routing weights."""
 
     def __init__(self, input_dim: int, n_experts: int, dropout: float = 0.1):
         super().__init__()

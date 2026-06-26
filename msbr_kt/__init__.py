@@ -1,4 +1,3 @@
-"""MSBR-KT: Multifaceted Structured-Bias Routing for Knowledge Tracing."""
 
 from .config import default_config
 from .model import MSBRKT

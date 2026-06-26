@@ -49,7 +49,6 @@ def initialize_run(
     overrides: Mapping[str, Any] | None = None,
     config_path: str | os.PathLike[str] | None = None,
 ) -> tuple[dict[str, Any], torch.device]:
-    """Prepare config, device, random seed, and run directory."""
     config_overrides: dict[str, Any] = {}
     if config_path is not None:
         config_overrides.update(load_json(config_path))

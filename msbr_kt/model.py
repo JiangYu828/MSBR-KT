@@ -11,14 +11,6 @@ from .relations import BIAS_NAMES, RelationResources
 
 
 class MSBRKT(nn.Module):
-    """MSBR-KT model.
-
-    The model expects a batch dictionary produced by ``msbr_kt.data.collate_batch``
-    or an equivalent tensor dictionary with these keys:
-    ``item_seq``, ``skill_seq``, ``label_seq``, ``dt_seq``, ``prev_y_seq``,
-    ``prev_ac_seq``, ``prev_posr_seq``, ``prev_pcr_seq``, ``prev_dt_seq``,
-    ``mask``, and ``pad_mask``.
-    """
 
     def __init__(self, cfg: dict[str, Any], relations: dict[str, torch.Tensor] | RelationResources):
         super().__init__()
@@ -41,7 +33,7 @@ class MSBRKT(nn.Module):
 
         self.skill_emb = nn.Embedding(self.skill_count + 1, d_model // 2, padding_idx=0)
         self.item_id_emb = nn.Embedding(self.item_count + 1, d_model // 4, padding_idx=0)
-        self.response_emb = nn.Embedding(3, d_model // 8, padding_idx=0)  # 0 pad/no-history, 1 wrong, 2 correct
+        self.response_emb = nn.Embedding(3, d_model // 8, padding_idx=0)
         self.num_mlp = nn.Sequential(
             nn.Linear(4, d_model // 8),
             nn.ReLU(),
@@ -98,8 +90,8 @@ class MSBRKT(nn.Module):
         pad_mask = batch["pad_mask"].bool()
 
         h = self._encode_input(batch)
-        bias_stack = self.bias_builder(batch)                  # [B, K, T, T]
-        bias_rows = bias_stack.permute(0, 2, 1, 3).contiguous() # [B, T, K, T]
+        bias_stack = self.bias_builder(batch)
+        bias_rows = bias_stack.permute(0, 2, 1, 3).contiguous()
 
         entropy_sum = h.new_tensor(0.0)
         quad_sum = h.new_tensor(0.0)
@@ -107,7 +99,7 @@ class MSBRKT(nn.Module):
         last_attention = None
 
         for layer, router in zip(self.layers, self.routers):
-            routing = router(h)  # [B, H, T, K]
+            routing = router(h)
             entropy_sum = entropy_sum + (-(routing * routing.clamp_min(1e-9).log()).sum(dim=-1).mean())
             quad_sum = quad_sum + routing.pow(2).sum(dim=-1).mean()
             routed_bias = torch.einsum("bhtk,btkj->bhtj", routing, bias_rows)
