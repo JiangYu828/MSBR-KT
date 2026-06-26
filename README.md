@@ -83,7 +83,6 @@ MSBR-KT/
 └── evaluate.py
 ```
 
-The raw-data preprocessing scripts are not included in this repository. The released processed data can be directly used for model training and evaluation.
 
 ## Training
 
@@ -143,7 +142,6 @@ global_maps.pt
 relations.pt
 ```
 
-In particular, `relations.pt` is required by the structured-bias components of MSBR-KT.
 
 ## Citation
 
